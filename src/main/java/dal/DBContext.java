@@ -31,10 +31,10 @@ public class DBContext {
         // For example : StudentDBContext extends DBContext , 
         //where StudentDBContext is located in dal package, 
         try {
-            String user = "sa";
-            String password = "123";
-            String url = "jdbc:sqlserver://localhost\\SQLEXPRESS:1433;databaseName=WS_PRJ301";
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            String user = "root";
+            String password = "1234";
+            String url = "jdbc:mysql://localhost:3306/WS_PRJ301?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+            Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection(url, user, password);
 
             if (connection != null) {
@@ -48,6 +48,7 @@ public class DBContext {
 
     /**
      * Retrieves all subjects from the database
+     *
      * @return List of subjects
      * @throws SQLException if a database access error occurs
      */
@@ -74,6 +75,7 @@ public class DBContext {
 
     /**
      * Retrieves all instructors from the database
+     *
      * @return List of instructors
      * @throws SQLException if a database access error occurs
      */
@@ -81,8 +83,8 @@ public class DBContext {
         ArrayList<Instructor> instructors = new ArrayList<>();
         try {
             String query = "SELECT i.InstructorID, i.InstructorName, i.BirthDate, i.Gender, s.SubjectName " +
-                          "FROM Instructors i " +
-                          "JOIN Subjects s ON s.SubjectID = i.SubjectID";
+                    "FROM Instructors i " +
+                    "JOIN Subjects s ON s.SubjectID = i.SubjectID";
             preparedStatement = connection.prepareStatement(query);
             resultSet = preparedStatement.executeQuery();
 
@@ -105,6 +107,7 @@ public class DBContext {
 
     /**
      * Retrieves instructors by subject name
+     *
      * @param subjectName The name of the subject
      * @return List of instructors for the given subject
      * @throws SQLException if a database access error occurs
@@ -113,9 +116,9 @@ public class DBContext {
         ArrayList<Instructor> instructors = new ArrayList<>();
         try {
             String query = "SELECT i.InstructorID, i.InstructorName, i.BirthDate, i.Gender, s.SubjectName " +
-                          "FROM Instructors i " +
-                          "JOIN Subjects s ON s.SubjectID = i.SubjectID " +
-                          "WHERE s.SubjectName = ?";
+                    "FROM Instructors i " +
+                    "JOIN Subjects s ON s.SubjectID = i.SubjectID " +
+                    "WHERE s.SubjectName = ?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, subjectName);
             resultSet = preparedStatement.executeQuery();
@@ -139,6 +142,7 @@ public class DBContext {
 
     /**
      * Retrieves an instructor by ID
+     *
      * @param instructorId The ID of the instructor
      * @return The instructor with the given ID, or null if not found
      * @throws SQLException if a database access error occurs
@@ -146,9 +150,9 @@ public class DBContext {
     public Instructor getInstructorById(String instructorId) throws SQLException {
         try {
             String query = "SELECT i.InstructorID, i.InstructorName, i.BirthDate, i.Gender, s.SubjectName " +
-                          "FROM Instructors i " +
-                          "JOIN Subjects s ON s.SubjectID = i.SubjectID " +
-                          "WHERE i.InstructorID = ?";
+                    "FROM Instructors i " +
+                    "JOIN Subjects s ON s.SubjectID = i.SubjectID " +
+                    "WHERE i.InstructorID = ?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, instructorId);
             resultSet = preparedStatement.executeQuery();
@@ -168,7 +172,25 @@ public class DBContext {
         return null;
     }
 
+    public boolean testConnection() {
+        if (connection != null) {
+            try {
+                return !connection.isClosed();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return false;
+    }
+
     public static void main(String[] args) {
+        //test connection
         DBContext db = new DBContext();
+        if (db.testConnection()) {
+            System.out.println("Kết nối thành công!");
+        } else {
+            System.out.println("Kết nối thất bại!");
+        }
     }
 }
