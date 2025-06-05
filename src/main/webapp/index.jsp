@@ -5,5 +5,6 @@
 </head>
 <body>
     <h1>Welcome to Store Application</h1>
+    <a href="/list">Go to List</a>
 </body>
 </html>
